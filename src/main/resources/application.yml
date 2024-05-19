@@ -1,0 +1,32 @@
+
+
+server:
+  port: 9000
+  servlet:
+    context-path: /
+    encoding:
+      charset: utf-8
+      enabled: true
+
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/kotlinBlog?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8
+    username: test
+    password: Test@12345678
+  jpa:
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    open-in-view: false
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+        globally_quoted_identifiers: true
+    show_sql: true
+
+#p6spy query logging
+#decorator:
+#  datasource:
+#    p6spy:
+#      enable-logging: true
