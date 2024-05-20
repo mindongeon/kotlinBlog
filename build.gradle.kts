@@ -32,6 +32,8 @@ dependencies {
 //    implementation("org.springframework.boot:spring-boot-starter-actuator")
 //    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+//    초기 데이터 삽입. 가짜 데이터 넣기.
+    implementation("io.github.serpro69:kotlin-faker:1.16.0")
 //    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 //    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
