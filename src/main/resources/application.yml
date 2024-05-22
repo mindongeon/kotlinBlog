@@ -26,7 +26,7 @@ spring:
     show_sql: true
 
 #p6spy query logging
-#decorator:
-#  datasource:
-#    p6spy:
-#      enable-logging: true
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
