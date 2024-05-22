@@ -16,7 +16,7 @@ class Post(
     var title: String = title
         private set
 
-    @Column(name = "content")
+    @Column(name = "content", length = 1000)
     var content: String = content
         private set
 

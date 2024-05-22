@@ -25,7 +25,27 @@ class Member(
     override fun toString(): String {
         return "Member(email='$email', password='$password', role=$role)"
     }
+
+    // 정적 팩토리 메소드 같은 것을 만들고 싶을 때
+    companion object {
+        fun createFakeMember(memberId: Long): Member {
+            val member =Member(
+                email = "",
+                password = "",
+                role = Role.USER
+            )
+            member.id = memberId
+            return member
+        }
+    }
 }
+
+fun Member.toDto(): MemberRes = MemberRes(
+    id = this.id!!,
+    email = this.email,
+    password = this.password,
+    role = this.role
+)
 
 enum class Role {
     USER, ADMIN
