@@ -3,6 +3,7 @@ package org.example.simpleblog.domain.post
 import jakarta.persistence.*
 import org.example.simpleblog.domain.AuditingEntity
 import org.example.simpleblog.domain.member.Member
+import org.example.simpleblog.domain.member.toDto
 
 @Entity
 @Table(name = "Post")
@@ -28,5 +29,17 @@ class Post(
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Member::class)
     var member: Member = member
         private set
+
+    fun toDto(): PostRes = PostRes(
+        this.id!!,
+        this.title,
+        this.content,
+        this.member.toDto()
+    )
+
+    override fun toString(): String {
+        return "Post(id=$id title='$title', content='$content', member=$member)"
+    }
+
 
 }
