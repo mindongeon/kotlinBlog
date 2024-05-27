@@ -1,5 +1,7 @@
 package org.example.simpleblog.domain.member
 
+import jakarta.validation.constraints.NotNull
+
 /**
  * dto <=> entity 간의 맵핑할 때
  *

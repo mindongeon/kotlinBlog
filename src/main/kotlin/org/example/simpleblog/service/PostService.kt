@@ -1,8 +1,7 @@
 package org.example.simpleblog.service
 
-import org.example.simpleblog.domain.post.Post
-import org.example.simpleblog.domain.post.PostRepository
-import org.example.simpleblog.domain.post.PostRes
+import org.example.simpleblog.domain.member.*
+import org.example.simpleblog.domain.post.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -18,5 +17,20 @@ class PostService (
     @Transactional(readOnly = true)
     fun findPosts(pageable: Pageable): Page<PostRes> {
         return postRepository.findAll(pageable).map { it.toDto() }
+    }
+
+    @Transactional
+    fun savePost(dto : PostSaveReq): PostRes {
+        return postRepository.save(dto.toEntity()).toDto()
+    }
+
+    @Transactional
+    fun deletePost(id: Long) {
+        return postRepository.deleteById(id)
+    }
+
+    @Transactional(readOnly = true)
+    fun findPostById(id: Long): PostRes {
+        return postRepository.findById(id).orElseThrow().toDto()
     }
 }
