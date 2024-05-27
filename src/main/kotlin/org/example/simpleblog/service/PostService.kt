@@ -3,6 +3,8 @@ package org.example.simpleblog.service
 import org.example.simpleblog.domain.post.Post
 import org.example.simpleblog.domain.post.PostRepository
 import org.example.simpleblog.domain.post.PostRes
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,7 +16,7 @@ class PostService (
      * Post 에서 Member가 LAZY로 되어 있어서 트랜잭션이 필요함
      */
     @Transactional(readOnly = true)
-    fun findPosts(): List<PostRes> {
-        return postRepository.findAll().map { it.toDto() }
+    fun findPosts(pageable: Pageable): Page<PostRes> {
+        return postRepository.findAll(pageable).map { it.toDto() }
     }
 }

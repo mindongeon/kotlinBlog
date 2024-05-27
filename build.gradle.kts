@@ -50,6 +50,11 @@ dependencies {
 
     implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
+
+
+    val jdslVersion = "2.2.1.RELEASE"
+    implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:$jdslVersion")
+    implementation("com.linecorp.kotlin-jdsl:spring-data-kotlin-jdsl-starter-jakarta:$jdslVersion")
 }
 
 tasks.withType<KotlinCompile> {
