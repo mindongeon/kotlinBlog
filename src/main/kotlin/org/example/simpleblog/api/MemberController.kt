@@ -1,5 +1,6 @@
 package org.example.simpleblog.api
 
+import jakarta.validation.Valid
 import org.example.simpleblog.domain.member.Member
 import org.example.simpleblog.domain.member.MemberSaveReq
 import org.example.simpleblog.service.MemberService
@@ -38,7 +39,7 @@ class MemberController(
     }
 
     @PostMapping("/member")
-    fun save(@RequestBody dto: MemberSaveReq): CmResDto<*> {
+    fun save(@Valid @RequestBody dto: MemberSaveReq): CmResDto<*> {
         return CmResDto(HttpStatus.OK, "save Member", memberService.saveMember(dto))
     }
 

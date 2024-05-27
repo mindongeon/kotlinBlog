@@ -1,18 +1,22 @@
 package org.example.simpleblog.domain.post
 
+import jakarta.validation.constraints.NotNull
 import org.example.simpleblog.domain.member.Member
 import org.example.simpleblog.domain.member.MemberRes
 
 data class PostSaveReq(
-    val title: String,
+    @field:NotNull(message = "title cannot be null")
+    val title: String?,
     val content: String,
-    val memberId: Long
+
+    @field:NotNull(message = "memberId cannot be null")
+    val memberId: Long?
 )
 
 fun PostSaveReq.toEntity(): Post = Post(
-    title = this.title,
+    title = this.title?: "",
     content = this.content,
-    member = Member.createFakeMember(this.memberId)
+    member = Member.createFakeMember(this.memberId!!)
 )
 
 data class PostRes(
