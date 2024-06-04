@@ -45,7 +45,7 @@ class LoggerAspect {
     }
 
     @AfterReturning(pointcut = "controllerCut()", returning = "result")
-    fun controllerLogAfter(joinPoint: JoinPoint, result: Any) {
+    fun controllerLogAfter(joinPoint: JoinPoint, result: Any?) {
 
         log.info {"""
          ${joinPoint.signature.name}   
