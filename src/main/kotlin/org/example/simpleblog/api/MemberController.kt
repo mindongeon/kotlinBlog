@@ -1,29 +1,31 @@
 package org.example.simpleblog.api
 
+import jakarta.servlet.http.HttpSession
 import jakarta.validation.Valid
-import org.example.simpleblog.domain.member.Member
 import org.example.simpleblog.domain.member.MemberSaveReq
 import org.example.simpleblog.service.MemberService
 import org.example.simpleblog.util.value.CmResDto
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 
+@RequestMapping("/api")
 @RestController
 class MemberController(
     private val memberService: MemberService
 ) {
 
     @GetMapping("/members")
-    fun findAll(@PageableDefault(size = 10) pageable: Pageable): CmResDto<*> {
+    fun findAll(@PageableDefault(size = 10) pageable: Pageable, session: HttpSession): CmResDto<*> {
+
         return CmResDto(HttpStatus.OK, "find All Members", memberService.findAll(pageable))
     }
 
