@@ -2,6 +2,7 @@ package org.example.simpleblog.domain.member
 
 import jakarta.persistence.*
 import org.example.simpleblog.domain.AuditingEntity
+import org.example.simpleblog.domain.post.Post
 
 @Entity
 @Table(name = "Member")
@@ -21,6 +22,9 @@ class Member(
     @Enumerated(EnumType.STRING)
     var role: Role = role
         private set
+
+    @OneToMany(mappedBy = "", targetEntity = Post::class)
+    var posts = mutableListOf<Post>()
 
     override fun toString(): String {
         return "Member(email='$email', password='$password', role=$role)"
