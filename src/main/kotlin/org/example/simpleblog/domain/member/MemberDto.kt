@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull
  *
  */
 
-data class MemberSaveReq(
+data class LoginDto(
     @field:NotNull(message = "email cannot be null")
     val email: String?,
     val password: String?,
@@ -20,7 +20,7 @@ data class MemberSaveReq(
 }
 
 //확장 함수
-fun MemberSaveReq.toEntity(): Member {
+fun LoginDto.toEntity(): Member {
     return Member(
         email = this.email?: "",
         password = this.password?: "",

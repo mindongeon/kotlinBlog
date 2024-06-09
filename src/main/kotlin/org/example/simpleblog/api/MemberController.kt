@@ -2,7 +2,7 @@ package org.example.simpleblog.api
 
 import jakarta.servlet.http.HttpSession
 import jakarta.validation.Valid
-import org.example.simpleblog.domain.member.MemberSaveReq
+import org.example.simpleblog.domain.member.LoginDto
 import org.example.simpleblog.service.MemberService
 import org.example.simpleblog.util.value.CmResDto
 import org.springframework.data.domain.Pageable
@@ -41,7 +41,7 @@ class MemberController(
     }
 
     @PostMapping("/member")
-    fun save(@Valid @RequestBody dto: MemberSaveReq): CmResDto<*> {
+    fun save(@Valid @RequestBody dto: LoginDto): CmResDto<*> {
         return CmResDto(HttpStatus.OK, "save Member", memberService.saveMember(dto))
     }
 

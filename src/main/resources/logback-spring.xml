@@ -4,7 +4,7 @@
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <withJansi>true</withJansi>
+<!--        <withJansi>true</withJansi>-->
         <encoder>
             <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %clr(${LOG_LEVEL_PATTERN:-%5p}) %logger{35} %cyan(%logger{15}) %green(%M) %n %msg%n</pattern>
             <charset>UTF-8</charset>
@@ -12,6 +12,7 @@
     </appender>
 
     <!--파일에 로그 처리 -->
+<!--
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_PATH}/logback.log</file>
         <encoder>
@@ -19,17 +20,19 @@
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!--.gz, .zip 등을 넣으면 자동 일자별 로그 압축-->
+            &lt;!&ndash;.gz, .zip 등을 넣으면 자동 일자별 로그 압축&ndash;&gt;
             <fileNamePattern>${LOGS_PATH}/logback.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!--파일당 최고 용량-->
+                &lt;!&ndash;파일당 최고 용량&ndash;&gt;
                 <maxFileSize>5MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <!--일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거-->
+            &lt;!&ndash;일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거&ndash;&gt;
             <maxHistory>7</maxHistory>
         </rollingPolicy>
     </appender>
+-->
 
+<!--    <root level="debug">-->
     <root level="info">
         <appender-ref ref="STDOUT"/>
 <!--        <appender-ref ref="FILE"/>-->

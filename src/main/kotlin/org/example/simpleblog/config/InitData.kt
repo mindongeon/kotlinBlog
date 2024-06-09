@@ -51,7 +51,7 @@ class InitData(
     ).toEntity()
 
 
-    private fun generateMember(): Member = MemberSaveReq(
+    private fun generateMember(): Member = LoginDto(
         email = faker.internet.safeEmail(),
         password = "1234",
         role = Role.USER

@@ -44,7 +44,7 @@ class FilterConfig {
      *
      */
 
-    @Bean
+//    @Bean
     fun registMyAuthFilter(): FilterRegistrationBean<MyAuthFilter> {
 
         val bean = FilterRegistrationBean(MyAuthFilter())

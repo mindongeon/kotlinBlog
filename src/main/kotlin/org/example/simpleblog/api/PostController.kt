@@ -1,7 +1,6 @@
 package org.example.simpleblog.api
 
 import jakarta.validation.Valid
-import org.example.simpleblog.domain.member.MemberSaveReq
 import org.example.simpleblog.domain.post.PostSaveReq
 import org.example.simpleblog.service.PostService
 import org.example.simpleblog.util.value.CmResDto

@@ -35,7 +35,12 @@ dependencies {
 //    초기 데이터 삽입. 가짜 데이터 넣기.
     implementation("io.github.serpro69:kotlin-faker:1.16.0")
 //    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-//    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    // https://mvnrepository.com/artifact/com.auth0/java-jwt
+    implementation("com.auth0:java-jwt:3.19.2")
+
+
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-aop:2.7.0")
@@ -46,7 +51,7 @@ dependencies {
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 //    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-//    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")

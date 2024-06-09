@@ -22,7 +22,7 @@ class MemberService(
         }
 
     @Transactional
-    fun saveMember(dto : MemberSaveReq): MemberRes {
+    fun saveMember(dto : LoginDto): MemberRes {
         return memberRepository.save(dto.toEntity()).toDto()
     }
 
