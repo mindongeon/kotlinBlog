@@ -13,7 +13,8 @@ class JwtManager {
     private val claimEmail = "email"
     private val claimPassword = "password"
     private val expireTime = 1000 * 60 * 60
-    val jwtHeader = "Authorization"
+    val authorizationHeader = "Authorization"
+    val jwtHeader = "Bearer "
 
     // Spring Security에서 principal을 인증 주체로 사용함
     fun generateToken(principal: PrincipalDetails): String {

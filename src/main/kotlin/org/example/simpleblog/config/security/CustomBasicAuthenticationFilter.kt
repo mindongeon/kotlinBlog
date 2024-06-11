@@ -31,18 +31,23 @@ class CustomBasicAuthenticationFilter(
             return
         }
 
-        log.debug { "token: $token" }
+        log.info { "token: $token" }
         val memberEmail = jwtManager.getMemberEmail(token) ?: throw RuntimeException("Member Email을 찾을 수 없습니다.")
 
         val member = memberRepository.findMemberByEmail(memberEmail)
+
+        log.info { "findMemberByEmail: $member" }
+
         // 인증객체
         val principalDetails = PrincipalDetails(member)
-        // 인자가 2개일 경우 credentials이 암호화되기 전의 값과 비교하기 때문에 무조건  denied 된다.
+        // 인자가 2개일 경우 credentials이 암호화되기 전의 값과 비교하기 때문에 무조건 denied 된다.
         val authentication:Authentication = UsernamePasswordAuthenticationToken(
             principalDetails,
             principalDetails.password,
             principalDetails.authorities
         )
+
+        log.info { "authentication: $authentication" }
 
         SecurityContextHolder.getContext().authentication = authentication
         chain.doFilter(request, response)

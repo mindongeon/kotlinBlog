@@ -23,8 +23,6 @@ class Member(
     var role: Role = role
         private set
 
-    @OneToMany(mappedBy = "", targetEntity = Post::class)
-    var posts = mutableListOf<Post>()
 
     override fun toString(): String {
         return "Member(email='$email', password='$password', role=$role)"
@@ -36,7 +34,7 @@ class Member(
             val member =Member(
                 email = "doris.daniel@dibbert-kiehn.test",
                 password = "1234",
-                role = Role.USER
+                role = Role.ADMIN
             )
             member.id = memberId
             return member

@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import org.example.simpleblog.domain.member.MemberRepository
+import org.example.simpleblog.domain.member.Role
 import org.example.simpleblog.util.func.responseData
 import org.example.simpleblog.util.value.CmResDto
 import org.springframework.boot.web.servlet.FilterRegistrationBean
@@ -56,21 +57,23 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
 
         http
+            .csrf { csrf -> csrf.disable() }
+            .headers { header -> header.disable() }
+            .formLogin { form -> form.disable()}
+            .httpBasic { basic -> basic.disable() }
+            .sessionManagement { session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .addFilter(loginFilter())
             .addFilter(authenticationFilter())
-            .securityMatcher("/**")
             .exceptionHandling { exception ->
                 exception.accessDeniedHandler(CustomAccessDeniedHandler())
+                exception.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper))
             }
-            /*
-                        .exceptionHandling {
-                            exception -> exception.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper))
-                        }
-            */
             .authorizeHttpRequests { authRequest ->
+                authRequest.requestMatchers("/v1/posts").hasAnyRole("USER", "ADMIN")
+
                 authRequest.anyRequest()
-//                .permitAll()
-                    .authenticated()
+                    .permitAll()
+//                    .authenticated()
             }
 
 
@@ -115,6 +118,7 @@ class SecurityConfig(
             request: HttpServletRequest, response: HttpServletResponse, accessDeniedException: AccessDeniedException?
         ) {
             log.info { "access denied !!!" }
+            accessDeniedException?.printStackTrace()
 
             response.sendError(HttpServletResponse.SC_FORBIDDEN)
         }
@@ -125,7 +129,7 @@ class SecurityConfig(
         private val objectMapper: ObjectMapper
     ) : AuthenticationEntryPoint {
 
-        val log = KotlinLogging.logger { }
+        private val log = KotlinLogging.logger { }
 
         override fun commence(
             request: HttpServletRequest,

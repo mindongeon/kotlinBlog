@@ -8,9 +8,8 @@ import java.util.ArrayList
 
 
 class PrincipalDetails(
-
     member: Member
-) : UserDetails{
+) : UserDetails {
 
 
     var member: Member = member
@@ -20,10 +19,11 @@ class PrincipalDetails(
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
 
-        log.info { "Role 검증"}
+        log.info { "Role 검증 ${member.role}" }
 
-        val collection:MutableCollection<GrantedAuthority> = ArrayList()
-        collection.add(GrantedAuthority { "Role_${member.role}" })
+        val collection: MutableCollection<GrantedAuthority> = ArrayList()
+//        ROLE 은 항상 대문자
+        collection.add(GrantedAuthority { "ROLE_${member.role}" })
 
         return collection
 
