@@ -31,6 +31,8 @@ class CustomUserNameAuthenticationFilter(
         log.info { "loginDto ::: $loginDto" }
         val authenticationToken = UsernamePasswordAuthenticationToken(loginDto.email, loginDto.password)
 
+        log.info { "로그인 토큰 $authenticationToken" }
+
         return this.authenticationManager.authenticate(authenticationToken)
     }
 

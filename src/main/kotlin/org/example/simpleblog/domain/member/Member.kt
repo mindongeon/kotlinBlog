@@ -34,8 +34,8 @@ class Member(
     companion object {
         fun createFakeMember(memberId: Long): Member {
             val member =Member(
-                email = "",
-                password = "",
+                email = "doris.daniel@dibbert-kiehn.test",
+                password = "1234",
                 role = Role.USER
             )
             member.id = memberId
