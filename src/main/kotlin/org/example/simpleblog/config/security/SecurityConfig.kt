@@ -47,7 +47,7 @@ class SecurityConfig(
 
     private val log = KotlinLogging.logger { }
 
-//    @Bean
+    //    @Bean
     fun webSecurityCustomizer(): WebSecurityCustomizer {
         return WebSecurityCustomizer { web: WebSecurity -> web.ignoring().requestMatchers("/**") }
     }
@@ -59,18 +59,18 @@ class SecurityConfig(
             .addFilter(loginFilter())
             .addFilter(authenticationFilter())
             .securityMatcher("/**")
-            .exceptionHandling{
-                exception -> exception.accessDeniedHandler(CustomAccessDeniedHandler())
+            .exceptionHandling { exception ->
+                exception.accessDeniedHandler(CustomAccessDeniedHandler())
             }
-/*
-            .exceptionHandling {
-                exception -> exception.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper))
-            }
-*/
-            .authorizeHttpRequests {
-                authRequest -> authRequest.anyRequest()
+            /*
+                        .exceptionHandling {
+                            exception -> exception.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper))
+                        }
+            */
+            .authorizeHttpRequests { authRequest ->
+                authRequest.anyRequest()
 //                .permitAll()
-                .authenticated()
+                    .authenticated()
             }
 
 
@@ -81,8 +81,9 @@ class SecurityConfig(
         private val log = KotlinLogging.logger { }
         override fun onAuthenticationFailure(
             request: HttpServletRequest,
-             response: HttpServletResponse,
-             exception: AuthenticationException?) {
+            response: HttpServletResponse,
+            exception: AuthenticationException?
+        ) {
             log.warn { "로그인 실패 !!!!" }
 
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "인증 실패")
@@ -97,7 +98,8 @@ class SecurityConfig(
         override fun onAuthenticationSuccess(
             request: HttpServletRequest,
             response: HttpServletResponse,
-            authentication: Authentication?) {
+            authentication: Authentication?
+        ) {
 
             log.info { "로그인 성공 !!!!" }
 
@@ -107,12 +109,10 @@ class SecurityConfig(
 
     class CustomAccessDeniedHandler() : AccessDeniedHandler {
 
-        private val log = KotlinLogging.logger {  }
+        private val log = KotlinLogging.logger { }
 
         override fun handle(
-            request: HttpServletRequest
-            , response: HttpServletResponse
-            , accessDeniedException: AccessDeniedException?
+            request: HttpServletRequest, response: HttpServletResponse, accessDeniedException: AccessDeniedException?
         ) {
             log.info { "access denied !!!" }
 
@@ -121,15 +121,17 @@ class SecurityConfig(
 
     }
 
-    class CustomAuthenticationEntryPoint (
+    class CustomAuthenticationEntryPoint(
         private val objectMapper: ObjectMapper
-    ): AuthenticationEntryPoint {
+    ) : AuthenticationEntryPoint {
 
         val log = KotlinLogging.logger { }
 
-        override fun commence(request: HttpServletRequest,
-                              response: HttpServletResponse,
-                              authException: AuthenticationException?) {
+        override fun commence(
+            request: HttpServletRequest,
+            response: HttpServletResponse,
+            authException: AuthenticationException?
+        ) {
             log.info { "access denied !!! in EntryPoint" }
 
             response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.reasonPhrase)
@@ -152,7 +154,7 @@ class SecurityConfig(
     }
 
     @Bean
-    fun authenticationManager() : AuthenticationManager {
+    fun authenticationManager(): AuthenticationManager {
         return authenticationConfiguration.authenticationManager
     }
 
