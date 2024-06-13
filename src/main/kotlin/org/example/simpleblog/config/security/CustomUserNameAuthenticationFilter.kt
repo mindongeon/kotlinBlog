@@ -22,7 +22,7 @@ class CustomUserNameAuthenticationFilter(
 
     override fun attemptAuthentication(request: HttpServletRequest?, response: HttpServletResponse?): Authentication {
 
-        log.info { "login 요청 옴" }
+        log.debug { "login 요청 옴" }
 
         lateinit var loginDto: LoginDto
         try {
@@ -31,10 +31,10 @@ class CustomUserNameAuthenticationFilter(
             log.error { "loginFilter : 로그인 요청 Dto 생성 중 실패! $e" }
         }
 
-        log.info { "loginDto ::: $loginDto" }
+        log.debug { "loginDto ::: $loginDto" }
         val authenticationToken = UsernamePasswordAuthenticationToken(loginDto.email, loginDto.password)
 
-        log.info { "로그인 토큰 ${om.writeValueAsString(authenticationToken.principal)}" }
+        log.debug { "로그인 토큰 ${om.writeValueAsString(authenticationToken.principal)}" }
 
         // UserDetailsService를 상속받아서 AuthService 를 탄다.
         return this.authenticationManager.authenticate(authenticationToken)
@@ -47,7 +47,7 @@ class CustomUserNameAuthenticationFilter(
         authResult: Authentication?
     ) {
 
-        log.info { "로그인 완료 후 JWT 토큰 만들어서 response" }
+        log.debug { "로그인 완료 후 JWT 토큰 만들어서 response" }
 
         val principalDetails = authResult?.principal as PrincipalDetails
 

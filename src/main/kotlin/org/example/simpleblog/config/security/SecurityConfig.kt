@@ -16,6 +16,8 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -24,6 +26,7 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
@@ -33,6 +36,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationFilter
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -40,6 +44,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity(debug = false)
+
+// 조금 더 세세한 메서드 인증? 제한
+@EnableMethodSecurity(securedEnabled = true)
 class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
     private val objectMapper: ObjectMapper,
@@ -75,9 +82,37 @@ class SecurityConfig(
                     .permitAll()
 //                    .authenticated()
             }
+            .logout {
+                it.logoutUrl("/logout")
+                it.logoutSuccessHandler(CustomLogoutSuccessHandler(objectMapper))
+            }
 
 
         return http.build()
+    }
+
+    class CustomLogoutSuccessHandler(
+        private val om: ObjectMapper
+    ): LogoutSuccessHandler {
+
+        private val log = KotlinLogging.logger { }
+
+        override fun onLogoutSuccess(
+            request: HttpServletRequest,
+            response: HttpServletResponse,
+            authentication: Authentication?
+        ) {
+
+            log.info { "logout success" }
+
+            val context = SecurityContextHolder.getContext()
+            context.authentication = null
+            SecurityContextHolder.clearContext()
+
+            val cmResDto = CmResDto(HttpStatus.OK, "logout success", null)
+
+            responseData(response, om.writeValueAsString(cmResDto))
+        }
     }
 
     class CustomFailureHandler : AuthenticationFailureHandler {

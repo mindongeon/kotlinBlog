@@ -10,8 +10,14 @@ import mu.KotlinLogging
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * 보통 JWT 토큰의 기간을 짧게 가져가는게 보안에 좋지만,
+ * 짧을 수록 사용자의 불쾌감이 높아짐.
+ *
+ * --> refreshToken
+ */
 class JwtManager(
-    accessTokenExpireSecond:Long = 300
+    accessTokenExpireSecond:Long = 60
 ) {
 
     private val log = KotlinLogging.logger {}
@@ -25,13 +31,17 @@ class JwtManager(
     val jwtHeader = "Bearer "
     private val jwtSubject = "my-token"
 
+    fun generateRefreshToken(principal: String) {
+
+    }
+
     // Spring Security에서 principal을 인증 주체로 사용함
     fun generateAccessToken(principal: String): String {
-        log.info { "generate token" }
+        log.debug { "generate token" }
 
         val expireDate = Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMinutes(accessTokenExpireSecond))
 
-        log.info { "access token expire date: $expireDate" }
+        log.debug { "access token expire date: $expireDate" }
 
         return JWT.create()
             .withSubject(jwtSubject)
@@ -51,7 +61,7 @@ class JwtManager(
 
         val principalString = decodedJWT.getClaim(claimPrincipal).asString()
 
-        log.info { "get principle principal: $principalString" }
+        log.debug { "get principle principal: $principalString" }
 
         return principalString
     }

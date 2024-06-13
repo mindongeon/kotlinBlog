@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import jakarta.persistence.*
 import org.example.simpleblog.domain.AuditingEntity
 import org.example.simpleblog.domain.member.Member
-import org.example.simpleblog.domain.member.toDto
 
 @Entity
 @Table(name = "Post")

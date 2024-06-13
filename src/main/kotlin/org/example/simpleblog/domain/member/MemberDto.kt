@@ -1,6 +1,7 @@
 package org.example.simpleblog.domain.member
 
 import jakarta.validation.constraints.NotNull
+import java.time.LocalDateTime
 
 /**
  * dto <=> entity 간의 맵핑할 때
@@ -32,5 +33,7 @@ data class MemberRes (
     val id: Long,
     val email: String,
     val password: String,
-    val role: Role
+    val role: Role,
+    val createAt: LocalDateTime,
+    val updateAt: LocalDateTime
 )

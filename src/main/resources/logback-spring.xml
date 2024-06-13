@@ -37,4 +37,9 @@
         <appender-ref ref="STDOUT"/>
 <!--        <appender-ref ref="FILE"/>-->
     </root>
+
+    <logger name="org.example.simpleblog" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
 </configuration>

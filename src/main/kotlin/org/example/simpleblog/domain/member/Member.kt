@@ -33,7 +33,7 @@ class Member(
 
 
     override fun toString(): String {
-        return "Member(email='$email', password='$password', role=$role)"
+        return "Member(email='$email', password='$password', role=$role, createAt=$createAt, updateAt=$updateAt)"
     }
 
     // 정적 팩토리 메소드 같은 것을 만들고 싶을 때
@@ -47,14 +47,17 @@ class Member(
             return member
         }
     }
+
+    fun toDto(): MemberRes = MemberRes(
+        id = this.id!!,
+        email = this.email,
+        password = this.password,
+        role = this.role,
+        createAt = this.createAt,
+        updateAt = this.updateAt
+    )
 }
 
-fun Member.toDto(): MemberRes = MemberRes(
-    id = this.id!!,
-    email = this.email,
-    password = this.password,
-    role = this.role
-)
 
 enum class Role {
     USER, ADMIN

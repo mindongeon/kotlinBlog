@@ -24,24 +24,24 @@ class CustomBasicAuthenticationFilter(
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
 
-        log.info { "권한이나 인증이 필요한 요청이 들어옴" }
+        log.debug { "권한이나 인증이 필요한 요청이 들어옴" }
 
         val token = request.getHeader(jwtManager.authorizationHeader)?.replace("Bearer ", "")
         if (token == null) {
-            log.info { "token이 없습니다." }
+            log.debug { "token이 없습니다." }
             chain.doFilter(request, response)
             return
         }
 
-        log.info { "token: $token" }
+        log.debug { "token: $token" }
 
         val principalJsonData = jwtManager.getPrincipalStringByAccessToken(token)
 
-        log.info { "principalJsonData: $principalJsonData" }
+        log.debug { "principalJsonData: $principalJsonData" }
 
         val principalDetails = om.readValue(principalJsonData, PrincipalDetails::class.java)
 
-        log.info { "principal: $principalDetails" }
+        log.debug { "principal: $principalDetails" }
 
 //        val member = memberRepository.findMemberByEmail(details.member.email)
         // 인증객체
@@ -53,7 +53,7 @@ class CustomBasicAuthenticationFilter(
             principalDetails.authorities
         )
 
-        log.info { "authentication: $authentication" }
+        log.debug { "authentication: $authentication" }
 
         SecurityContextHolder.getContext().authentication = authentication
         chain.doFilter(request, response)
