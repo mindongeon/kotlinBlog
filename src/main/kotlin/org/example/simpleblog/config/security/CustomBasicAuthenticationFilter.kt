@@ -1,5 +1,6 @@
 package org.example.simpleblog.config.security
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -13,10 +14,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 class CustomBasicAuthenticationFilter(
     private val memberRepository: MemberRepository,
+    private val om: ObjectMapper,
     authenticationManager: AuthenticationManager
 ) : BasicAuthenticationFilter(authenticationManager) {
 
-    val log = KotlinLogging.logger {  }
+    val log = KotlinLogging.logger { }
 
     private val jwtManager = JwtManager()
 
@@ -24,7 +26,7 @@ class CustomBasicAuthenticationFilter(
 
         log.info { "권한이나 인증이 필요한 요청이 들어옴" }
 
-        val token = request.getHeader(jwtManager.jwtHeader)?.replace("Bearer ", "")
+        val token = request.getHeader(jwtManager.authorizationHeader)?.replace("Bearer ", "")
         if (token == null) {
             log.info { "token이 없습니다." }
             chain.doFilter(request, response)
@@ -32,16 +34,20 @@ class CustomBasicAuthenticationFilter(
         }
 
         log.info { "token: $token" }
-        val memberEmail = jwtManager.getMemberEmail(token) ?: throw RuntimeException("Member Email을 찾을 수 없습니다.")
 
-        val member = memberRepository.findMemberByEmail(memberEmail)
+        val principalJsonData = jwtManager.getPrincipalStringByAccessToken(token)
 
-        log.info { "findMemberByEmail: $member" }
+        log.info { "principalJsonData: $principalJsonData" }
 
+        val principalDetails = om.readValue(principalJsonData, PrincipalDetails::class.java)
+
+        log.info { "principal: $principalDetails" }
+
+//        val member = memberRepository.findMemberByEmail(details.member.email)
         // 인증객체
-        val principalDetails = PrincipalDetails(member)
+//        val principalDetails = PrincipalDetails(member)
         // 인자가 2개일 경우 credentials이 암호화되기 전의 값과 비교하기 때문에 무조건 denied 된다.
-        val authentication:Authentication = UsernamePasswordAuthenticationToken(
+        val authentication: Authentication = UsernamePasswordAuthenticationToken(
             principalDetails,
             principalDetails.password,
             principalDetails.authorities

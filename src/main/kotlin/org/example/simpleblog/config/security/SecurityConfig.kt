@@ -153,7 +153,8 @@ class SecurityConfig(
     fun authenticationFilter(): CustomBasicAuthenticationFilter {
         return CustomBasicAuthenticationFilter(
             authenticationManager = authenticationManager(),
-            memberRepository = memberRepository
+            memberRepository = memberRepository,
+            om = objectMapper,
         )
     }
 

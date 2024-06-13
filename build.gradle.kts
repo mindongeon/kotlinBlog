@@ -45,7 +45,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-aop:2.7.0")
 //    implementation("org.springframework.boot:spring-boot-starter-websocket")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
@@ -56,6 +55,11 @@ dependencies {
 
     implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
+
+    // jackson
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.4")
+
 
 
     val jdslVersion = "2.2.1.RELEASE"

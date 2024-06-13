@@ -1,32 +1,43 @@
 package org.example.simpleblog.config.security
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeName
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import mu.KotlinLogging
 import org.example.simpleblog.domain.member.Member
+import org.example.simpleblog.domain.member.Role
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import java.util.ArrayList
+import java.util.*
 
 
-class PrincipalDetails(
-    member: Member
+class PrincipalDetails (
+     member: Member
 ) : UserDetails {
-
 
     var member: Member = member
         private set
 
     private val log = KotlinLogging.logger {}
 
+    @JsonIgnore
+    val collection: MutableCollection<GrantedAuthority> = ArrayList()
+    init {
+        // ROLE 은 항상 대문자
+        collection.add(GrantedAuthority { "ROLE_${member.role}" })
+    }
+
+    @JsonIgnore
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
 
         log.info { "Role 검증 ${member.role}" }
 
-        val collection: MutableCollection<GrantedAuthority> = ArrayList()
-//        ROLE 은 항상 대문자
-        collection.add(GrantedAuthority { "ROLE_${member.role}" })
+
 
         return collection
-
     }
 
     override fun getPassword(): String {

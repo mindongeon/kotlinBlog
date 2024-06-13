@@ -1,16 +1,24 @@
 package org.example.simpleblog.domain.member
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeName
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import jakarta.persistence.*
 import org.example.simpleblog.domain.AuditingEntity
 import org.example.simpleblog.domain.post.Post
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.MemberDeserializer
 
 @Entity
 @Table(name = "Member")
+@JsonTypeName(value="Member")
 class Member(
+    id: Long = 0,
     email: String,
     password: String,
-    role: Role
-) : AuditingEntity() {
+    role: Role = Role.USER
+) : AuditingEntity(id) {
     @Column(name = "email", nullable = false)
     var email: String = email
         private set
@@ -32,11 +40,10 @@ class Member(
     companion object {
         fun createFakeMember(memberId: Long): Member {
             val member =Member(
-                email = "doris.daniel@dibbert-kiehn.test",
-                password = "1234",
-                role = Role.ADMIN
+                id = memberId ,
+                "admin@example.com",
+                password = "1234"
             )
-            member.id = memberId
             return member
         }
     }

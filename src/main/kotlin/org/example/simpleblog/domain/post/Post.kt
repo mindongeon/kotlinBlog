@@ -1,5 +1,6 @@
 package org.example.simpleblog.domain.post
 
+import com.fasterxml.jackson.annotation.JsonTypeName
 import jakarta.persistence.*
 import org.example.simpleblog.domain.AuditingEntity
 import org.example.simpleblog.domain.member.Member
@@ -7,11 +8,13 @@ import org.example.simpleblog.domain.member.toDto
 
 @Entity
 @Table(name = "Post")
+@JsonTypeName(value="post")
 class Post(
+    id:Long = 0,
     title: String,
     content: String,
     member: Member
-) : AuditingEntity() {
+) : AuditingEntity(id) {
 
     @Column(name = "title", nullable = false)
     var title: String = title

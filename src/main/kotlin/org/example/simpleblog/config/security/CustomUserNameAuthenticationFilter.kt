@@ -34,7 +34,7 @@ class CustomUserNameAuthenticationFilter(
         log.info { "loginDto ::: $loginDto" }
         val authenticationToken = UsernamePasswordAuthenticationToken(loginDto.email, loginDto.password)
 
-        log.info { "로그인 토큰 $authenticationToken" }
+        log.info { "로그인 토큰 ${om.writeValueAsString(authenticationToken.principal)}" }
 
         // UserDetailsService를 상속받아서 AuthService 를 탄다.
         return this.authenticationManager.authenticate(authenticationToken)
@@ -51,12 +51,8 @@ class CustomUserNameAuthenticationFilter(
 
         val principalDetails = authResult?.principal as PrincipalDetails
 
-        val jwtToken = jwtManager.generateToken(principalDetails)
-
-        log.info { "response token ::: $jwtToken" }
-
+        val jwtToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
         response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $jwtToken")
-
         val jsonResult = om.writeValueAsString(CmResDto(HttpStatus.OK, "login success", principalDetails.member))
 
         // kotlin에서는 java처럼 class를 강제하지 않아 util같은 정적 클래스를 선언하지 않아도 됨.
