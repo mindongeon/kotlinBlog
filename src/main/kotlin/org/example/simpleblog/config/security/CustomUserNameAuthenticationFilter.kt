@@ -6,12 +6,15 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import org.example.simpleblog.domain.member.LoginDto
+import org.example.simpleblog.util.CookieProvider
 import org.example.simpleblog.util.func.responseData
 import org.example.simpleblog.util.value.CmResDto
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import java.util.concurrent.TimeUnit
 
 class CustomUserNameAuthenticationFilter(
     private val om: ObjectMapper
@@ -55,10 +58,12 @@ class CustomUserNameAuthenticationFilter(
         val accessToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
         val refreshToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
 
+        val refreshCookie = CookieProvider.createCookie("refreshCookie", refreshToken!!, TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay))
+
 
         response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $accessToken")
-        response.addHeader("refreshToken", "${jwtManager.jwtHeader} $accessToken")
-        
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+
 
         val jsonResult = om.writeValueAsString(CmResDto(HttpStatus.OK, "login success", principalDetails.member))
 

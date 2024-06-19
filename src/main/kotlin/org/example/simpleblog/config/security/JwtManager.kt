@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  */
 class JwtManager(
     private val accessTokenExpireSecond: Long = 30,
-    accessTokenExpireDay: Long = 7
+    val refreshTokenExpireDay: Long = 7
 ) {
 
     private val log = KotlinLogging.logger {}
@@ -26,8 +26,6 @@ class JwtManager(
     private val refreshSecretKey: String = "myRefreshSecretKey"
 
     val claimPrincipal = "principal"
-
-    private val refreshTokenExpireDay: Long = accessTokenExpireSecond
 
     val authorizationHeader = "Authorization"
     val jwtHeader = "Bearer "
@@ -63,30 +61,60 @@ class JwtManager(
     }
 
     fun getPrincipalStringByAccessToken(accessToken: String): String {
-        val decodedJWT = validatedJwt(accessToken)
+        val decodedJWT = getDecodeJwt(secretKey = accessSecretKey, token = accessToken)
 
-        val principalString = decodedJWT.getClaim(claimPrincipal).asString()
-
-        log.debug { "get principle principal: $principalString" }
-
-        return principalString
+        return decodedJWT.getClaim(claimPrincipal)?.asString() ?: throw RuntimeException("")
     }
 
-    fun validatedJwt(accessToken: String): DecodedJWT {
+    fun getPrincipalStringByRefreshToken(refreshToken: String): String {
+        val decodedJWT = getDecodeJwt(secretKey = refreshSecretKey, token = refreshToken)
 
-        try {
-            val algorithm = Algorithm.HMAC512(accessSecretKey)
-            val verifier: JWTVerifier = JWT.require(algorithm).build()
-            val jwt: DecodedJWT = verifier.verify(accessToken)
+        return decodedJWT.getClaim(claimPrincipal)?.asString() ?: throw RuntimeException("")
+    }
 
-            return jwt
+    private fun getDecodeJwt(secretKey: String, token: String): DecodedJWT {
+        val algorithm = Algorithm.HMAC512(secretKey)
+        val verifier: JWTVerifier = JWT.require(algorithm).build()
+        val decodedJWT: DecodedJWT = verifier.verify(token)
+
+
+        return decodedJWT
+    }
+
+    fun validAccessToken(token: String): TokenValidResult {
+        return validatedJwt(token, accessSecretKey)
+    }
+
+    fun validRefreshToken(token: String): TokenValidResult {
+        return validatedJwt(token, refreshSecretKey)
+    }
+
+    // Return Type : TURE | JWTVerificationException
+    private fun validatedJwt(token: String, secretKey: String): TokenValidResult {
+
+        return try {
+            getDecodeJwt(secretKey, token)
+
+            return TokenValidResult.Success()
         } catch (e: JWTVerificationException) {
-            log.error { "Invalid JWT Exception !! ${e.stackTraceToString()}" }
 
-            throw RuntimeException("Invalid JWT Exception !!!")
+            // log.error { "Invalid JWT Exception !! ${e.stackTraceToString()}" }
+
+            return TokenValidResult.Failure(e)
         }
-
     }
+
 
 }
 
+/**
+ * Kotlin 에서 UnionType 이란게 없음.
+ *
+ * TypeScript 의 경우 return 값이 String | Int 로 반환 가능.
+ *
+ * Kotlin 에서 UnionType 흉내내기
+ */
+sealed class TokenValidResult {
+    class Success(val successValue: Boolean = true) : TokenValidResult()
+    class Failure(val exception: JWTVerificationException) : TokenValidResult()
+}

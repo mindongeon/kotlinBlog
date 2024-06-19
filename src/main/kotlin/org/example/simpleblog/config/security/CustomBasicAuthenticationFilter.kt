@@ -1,5 +1,6 @@
 package org.example.simpleblog.config.security
 
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -26,22 +27,31 @@ class CustomBasicAuthenticationFilter(
 
         log.debug { "권한이나 인증이 필요한 요청이 들어옴" }
 
-        val token = request.getHeader(jwtManager.authorizationHeader)?.replace("Bearer ", "")
-        if (token == null) {
+        val accessToken = request.getHeader(jwtManager.authorizationHeader)?.replace("Bearer ", "")
+        if (accessToken == null) {
             log.debug { "token이 없습니다." }
             chain.doFilter(request, response)
             return
         }
 
-        log.debug { "token: $token" }
+        log.debug { "access token: $accessToken" }
 
-        val principalJsonData = jwtManager.getPrincipalStringByAccessToken(token)
+        val accessTokenResult: TokenValidResult = jwtManager.validAccessToken(accessToken)
 
-        log.debug { "principalJsonData: $principalJsonData" }
+        if (accessTokenResult is TokenValidResult.Failure) {
+            if (accessTokenResult.exception is TokenExpiredException) {
+                log.info { "getClass ::: ${accessTokenResult.javaClass}" }
+            } else {
+                log.error { accessTokenResult.exception.stackTraceToString() }
+            }
+        }
+
+
+        val principalJsonData = jwtManager.getPrincipalStringByAccessToken(accessToken)
+
 
         val principalDetails = om.readValue(principalJsonData, PrincipalDetails::class.java)
 
-        log.debug { "principal: $principalDetails" }
 
 //        val member = memberRepository.findMemberByEmail(details.member.email)
         // 인증객체
@@ -53,9 +63,37 @@ class CustomBasicAuthenticationFilter(
             principalDetails.authorities
         )
 
-        log.debug { "authentication: $authentication" }
 
         SecurityContextHolder.getContext().authentication = authentication
         chain.doFilter(request, response)
     }
+
+    /*
+    private fun reissueAccessToken(e: JWTVerificationException, req: HttpServletRequest?) {
+        if (e is TokenExpiredException) {
+                */
+    /**
+     * 이미 발급한 refreshToken (쿠키로 감싸져 있음)
+     * 까내서 요걸 토대로 다시 accessToken 발급하기.
+     */    /*
+
+            val refreshToken = CookieProvider.getCookie(req!!, "refreshCookie").orElseThrow()
+            val validateToken = validatedJwt(refreshToken)
+
+            val principalString = getPrincipalStringByAccessToken(refreshToken)
+
+            val principalDetails = ObjectMapper().readValue(principalString, PrincipalDetails::class.java)
+
+            val authentication: Authentication = UsernamePasswordAuthenticationToken(
+                principalDetails,
+                principalDetails.password,
+                principalDetails.authorities
+            )
+
+            SecurityContextHolder.getContext().authentication = authentication
+
+        }
+    }
+    */
+
 }
