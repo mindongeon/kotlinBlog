@@ -51,8 +51,15 @@ class CustomUserNameAuthenticationFilter(
 
         val principalDetails = authResult?.principal as PrincipalDetails
 
-        val jwtToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
-        response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $jwtToken")
+
+        val accessToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
+        val refreshToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
+
+
+        response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $accessToken")
+        response.addHeader("refreshToken", "${jwtManager.jwtHeader} $accessToken")
+        
+
         val jsonResult = om.writeValueAsString(CmResDto(HttpStatus.OK, "login success", principalDetails.member))
 
         // kotlin에서는 java처럼 class를 강제하지 않아 util같은 정적 클래스를 선언하지 않아도 됨.

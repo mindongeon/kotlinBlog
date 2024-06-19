@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.JWTVerifier
-import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -17,43 +16,50 @@ import java.util.concurrent.TimeUnit
  * --> refreshToken
  */
 class JwtManager(
-    accessTokenExpireSecond:Long = 60
+    private val accessTokenExpireSecond: Long = 30,
+    accessTokenExpireDay: Long = 7
 ) {
 
     private val log = KotlinLogging.logger {}
 
-    private val secretKey:String = "mySecretKey"
-    private val claimEmail = "email"
-    private val claimPassword = "password"
+    private val accessSecretKey: String = "myAccessSecretKey"
+    private val refreshSecretKey: String = "myRefreshSecretKey"
+
     val claimPrincipal = "principal"
-    private val accessTokenExpireSecond: Long = accessTokenExpireSecond
+
+    private val refreshTokenExpireDay: Long = accessTokenExpireSecond
+
     val authorizationHeader = "Authorization"
     val jwtHeader = "Bearer "
     private val jwtSubject = "my-token"
 
-    fun generateRefreshToken(principal: String) {
+    fun generateRefreshToken(principal: String): String? {
+
+        val expireDate = Date(System.currentTimeMillis() + TimeUnit.DAYS.toMinutes(refreshTokenExpireDay))
+        log.debug { "refresh token expire date: $expireDate" }
+
+
+        return doGenerateToken(expireDate, principal, refreshSecretKey)
 
     }
 
-    // Spring Security에서 principal을 인증 주체로 사용함
-    fun generateAccessToken(principal: String): String {
-        log.debug { "generate token" }
+    private fun doGenerateToken(
+        expireDate: Date,
+        principal: String,
+        secretKey: String
+    ): String? = JWT.create()
+        .withSubject(jwtSubject)
+        .withExpiresAt(expireDate)
+        .withClaim(claimPrincipal, principal)
+        .sign(Algorithm.HMAC512(secretKey))
 
+    // Spring Security에서 principal을 인증 주체로 사용함
+    fun generateAccessToken(principal: String): String? {
         val expireDate = Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMinutes(accessTokenExpireSecond))
 
         log.debug { "access token expire date: $expireDate" }
 
-        return JWT.create()
-            .withSubject(jwtSubject)
-            .withExpiresAt(expireDate)
-            .withClaim(claimPrincipal, principal)
-            .sign(Algorithm.HMAC512(secretKey))
-    }
-
-    fun getMemberEmail(token:String): String {
-        return JWT.require(Algorithm.HMAC512(secretKey)).build()
-            .verify(token)
-            .getClaim(claimEmail).asString()
+        return doGenerateToken(expireDate, principal, accessSecretKey)
     }
 
     fun getPrincipalStringByAccessToken(accessToken: String): String {
@@ -69,12 +75,9 @@ class JwtManager(
     fun validatedJwt(accessToken: String): DecodedJWT {
 
         try {
-            val algorithm = Algorithm.HMAC512(secretKey)
+            val algorithm = Algorithm.HMAC512(accessSecretKey)
             val verifier: JWTVerifier = JWT.require(algorithm).build()
             val jwt: DecodedJWT = verifier.verify(accessToken)
-
-
-
 
             return jwt
         } catch (e: JWTVerificationException) {
