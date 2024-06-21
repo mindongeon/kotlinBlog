@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import org.example.simpleblog.domain.member.MemberRepository
+import org.example.simpleblog.util.CookieProvider
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -41,6 +42,34 @@ class CustomBasicAuthenticationFilter(
         if (accessTokenResult is TokenValidResult.Failure) {
             if (accessTokenResult.exception is TokenExpiredException) {
                 log.info { "getClass ::: ${accessTokenResult.javaClass}" }
+
+                val refreshToken = CookieProvider.getCookie(request, "refreshCookie").orElseThrow()
+                val refreshTokenResult = jwtManager.validRefreshToken(refreshToken)
+
+                if (refreshTokenResult is TokenValidResult.Failure) {
+                    // 클라이언트 단에서 받아서 강제 로그아웃 처리 등 해버리기
+                    throw RuntimeException("invalid refresh token")
+                }
+                /**
+                 * 이미 발급한 refreshToken (쿠키로 감싸져 있음)
+                 * 까내서 요걸 토대로 다시 accessToken 발급하기.
+                 */
+
+                val principalString = jwtManager.getPrincipalStringByRefreshToken(refreshToken)
+                val details = om.readValue(principalString, PrincipalDetails::class.java)
+
+                val accessToken = jwtManager.generateAccessToken(om.writeValueAsString(details))
+                response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $accessToken")
+
+                val authentication: Authentication = UsernamePasswordAuthenticationToken(
+                    details,
+                    details.password,
+                    details.authorities
+                )
+                SecurityContextHolder.getContext().authentication = authentication // 인증 처리 끝
+                chain.doFilter(request, response)
+
+                return
             } else {
                 log.error { accessTokenResult.exception.stackTraceToString() }
             }
@@ -68,32 +97,5 @@ class CustomBasicAuthenticationFilter(
         chain.doFilter(request, response)
     }
 
-    /*
-    private fun reissueAccessToken(e: JWTVerificationException, req: HttpServletRequest?) {
-        if (e is TokenExpiredException) {
-                */
-    /**
-     * 이미 발급한 refreshToken (쿠키로 감싸져 있음)
-     * 까내서 요걸 토대로 다시 accessToken 발급하기.
-     */    /*
-
-            val refreshToken = CookieProvider.getCookie(req!!, "refreshCookie").orElseThrow()
-            val validateToken = validatedJwt(refreshToken)
-
-            val principalString = getPrincipalStringByAccessToken(refreshToken)
-
-            val principalDetails = ObjectMapper().readValue(principalString, PrincipalDetails::class.java)
-
-            val authentication: Authentication = UsernamePasswordAuthenticationToken(
-                principalDetails,
-                principalDetails.password,
-                principalDetails.authorities
-            )
-
-            SecurityContextHolder.getContext().authentication = authentication
-
-        }
-    }
-    */
 
 }

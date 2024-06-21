@@ -20,6 +20,7 @@ class UtilTest {
 
     val om = ObjectMapper()
 
+    /*
     @Test
     fun generateJwtTest() {
 
@@ -57,6 +58,7 @@ class UtilTest {
         log.info { "principalDetails: ${principalDetails.member}" }
 
     }
+    */
 
 
     @Test

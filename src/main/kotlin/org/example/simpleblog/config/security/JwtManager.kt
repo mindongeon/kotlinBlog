@@ -33,8 +33,9 @@ class JwtManager(
 
     fun generateRefreshToken(principal: String): String? {
 
-        val expireDate = Date(System.currentTimeMillis() + TimeUnit.DAYS.toMinutes(refreshTokenExpireDay))
+        val expireDate = Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(refreshTokenExpireDay))
         log.debug { "refresh token expire date: $expireDate" }
+
 
 
         return doGenerateToken(expireDate, principal, refreshSecretKey)
@@ -53,12 +54,13 @@ class JwtManager(
 
     // Spring Security에서 principal을 인증 주체로 사용함
     fun generateAccessToken(principal: String): String? {
-        val expireDate = Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMinutes(accessTokenExpireSecond))
+        val expireDate = Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(accessTokenExpireSecond))
 
         log.debug { "access token expire date: $expireDate" }
 
         return doGenerateToken(expireDate, principal, accessSecretKey)
     }
+
 
     fun getPrincipalStringByAccessToken(accessToken: String): String {
         val decodedJWT = getDecodeJwt(secretKey = accessSecretKey, token = accessToken)
