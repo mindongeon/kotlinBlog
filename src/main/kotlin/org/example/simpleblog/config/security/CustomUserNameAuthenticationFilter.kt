@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
 import org.example.simpleblog.domain.member.LoginDto
 import org.example.simpleblog.util.CookieProvider
+import org.example.simpleblog.util.CookieProvider.CookieName.REFRESH_COOKIE
 import org.example.simpleblog.util.func.responseData
 import org.example.simpleblog.util.value.CmResDto
 import org.springframework.http.HttpHeaders
@@ -58,7 +59,7 @@ class CustomUserNameAuthenticationFilter(
         val accessToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
         val refreshToken = jwtManager.generateRefreshToken(om.writeValueAsString(principalDetails))
 
-        val refreshCookie = CookieProvider.createCookie("refreshCookie", refreshToken!!, TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay))
+        val refreshCookie = CookieProvider.createCookie(REFRESH_COOKIE, refreshToken!!, TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay))
 
 
         response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $accessToken")

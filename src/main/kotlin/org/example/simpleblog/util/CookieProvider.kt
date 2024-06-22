@@ -18,9 +18,9 @@ object CookieProvider {
         TODO()
     }
 
-    fun createCookie(cookieName: String, value: String, maxAge: Long): ResponseCookie {
+    fun createCookie(cookieName: CookieName, value: String, maxAge: Long): ResponseCookie {
 
-        return ResponseCookie.from(cookieName, value)
+        return ResponseCookie.from(cookieName.name, value)
             // client단에서 JS로 접근 불가
             .httpOnly(true)
             // https 를 적용할게 아니라 http로 접근 허용
@@ -30,10 +30,10 @@ object CookieProvider {
             .build()
     }
 
-    fun getCookie(req: HttpServletRequest, cookieName: String): Optional<String> {
+    fun getCookie(req: HttpServletRequest, cookieName: CookieName): Optional<String> {
 
         val cookieValue = req.cookies.filter { cookie ->
-            cookie.name == cookieName
+            cookie.name == cookieName.name
         }.map { cookie ->
             cookie.value
         }.firstOrNull()
@@ -41,6 +41,10 @@ object CookieProvider {
         log.info { "cookeValue ::: $cookieValue" }
 
         return Optional.ofNullable(cookieValue)
+    }
+
+    enum class CookieName {
+        REFRESH_COOKIE
     }
 
 }
