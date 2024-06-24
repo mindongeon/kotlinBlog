@@ -10,7 +10,7 @@ import org.example.simpleblog.domain.AuditingEntity
 class Member(
     id: Long = 0,
     email: String,
-    rawPassword: String,
+    password: String,
     role: Role = Role.USER
 ) : AuditingEntity(id) {
     @Column(name = "email", nullable = false)
@@ -18,7 +18,7 @@ class Member(
         private set
 
     @Column(name = "password")
-    var password: String = rawPassword
+    var password: String = password
         private set
 
     @Enumerated(EnumType.STRING)
@@ -35,7 +35,7 @@ class Member(
             val member = Member(
                 id = memberId,
                 "admin@example.com",
-                rawPassword = "1234"
+                password = "1234"
             )
             return member
         }

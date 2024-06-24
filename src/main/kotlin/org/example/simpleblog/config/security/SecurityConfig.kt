@@ -4,36 +4,31 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import org.example.simpleblog.domain.HashMapRepositoryImpl
+import org.example.simpleblog.domain.InMemoryRepository
 import org.example.simpleblog.domain.member.MemberRepository
-import org.example.simpleblog.domain.member.Role
 import org.example.simpleblog.util.func.responseData
 import org.example.simpleblog.util.value.CmResDto
-import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer.AuthorizationManagerRequestMatcherRegistry
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
-import org.springframework.security.web.authentication.AuthenticationFilter
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler
@@ -66,7 +61,7 @@ class SecurityConfig(
         http
             .csrf { csrf -> csrf.disable() }
             .headers { header -> header.disable() }
-            .formLogin { form -> form.disable()}
+            .formLogin { form -> form.disable() }
             .httpBasic { basic -> basic.disable() }
             .sessionManagement { session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .addFilter(loginFilter())
@@ -77,7 +72,6 @@ class SecurityConfig(
             }
             .authorizeHttpRequests { authRequest ->
                 authRequest.requestMatchers("/v1/posts").hasAnyRole("USER", "ADMIN")
-
                 authRequest.anyRequest()
                     .permitAll()
 //                    .authenticated()
@@ -93,7 +87,7 @@ class SecurityConfig(
 
     class CustomLogoutSuccessHandler(
         private val om: ObjectMapper
-    ): LogoutSuccessHandler {
+    ) : LogoutSuccessHandler {
 
         private val log = KotlinLogging.logger { }
 
@@ -145,12 +139,14 @@ class SecurityConfig(
 
     }
 
-    class CustomAccessDeniedHandler() : AccessDeniedHandler {
+    class CustomAccessDeniedHandler : AccessDeniedHandler {
 
         private val log = KotlinLogging.logger { }
 
         override fun handle(
-            request: HttpServletRequest, response: HttpServletResponse, accessDeniedException: AccessDeniedException?
+            request: HttpServletRequest,
+            response: HttpServletResponse,
+            accessDeniedException: AccessDeniedException?
         ) {
             log.info { "access denied !!!" }
             accessDeniedException?.printStackTrace()
@@ -173,7 +169,10 @@ class SecurityConfig(
         ) {
             log.info { "access denied !!! in EntryPoint" }
 
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.reasonPhrase)
+            response.sendError(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.reasonPhrase
+            )
 
 
 //            val cmResDto = CmResDto(HttpStatus.UNAUTHORIZED, "access denied", authException)
@@ -185,11 +184,17 @@ class SecurityConfig(
     }
 
     @Bean
+    fun inMemoryRepository(): InMemoryRepository {
+        return HashMapRepositoryImpl()
+    }
+
+    @Bean
     fun authenticationFilter(): CustomBasicAuthenticationFilter {
         return CustomBasicAuthenticationFilter(
             authenticationManager = authenticationManager(),
             memberRepository = memberRepository,
             om = objectMapper,
+            memoryRepository = inMemoryRepository()
         )
     }
 
@@ -206,7 +211,8 @@ class SecurityConfig(
     @Bean
     fun loginFilter(): UsernamePasswordAuthenticationFilter {
 
-        val authenticationFilter = CustomUserNameAuthenticationFilter(objectMapper)
+        val authenticationFilter =
+            CustomUserNameAuthenticationFilter(objectMapper, inMemoryRepository())
 
         authenticationFilter.setAuthenticationManager(authenticationManager())
         authenticationFilter.setFilterProcessesUrl("/login")

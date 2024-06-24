@@ -13,7 +13,7 @@ spring:
     password: Test@12345678
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     # true로 할 시 트랜잭션이 끝나도 DB Connection이 반납되지 않는다.

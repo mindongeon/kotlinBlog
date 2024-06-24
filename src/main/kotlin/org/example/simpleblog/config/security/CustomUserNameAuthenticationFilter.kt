@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import org.example.simpleblog.domain.InMemoryRepository
 import org.example.simpleblog.domain.member.LoginDto
 import org.example.simpleblog.util.CookieProvider
 import org.example.simpleblog.util.CookieProvider.CookieName.REFRESH_COOKIE
@@ -18,7 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.concurrent.TimeUnit
 
 class CustomUserNameAuthenticationFilter(
-    private val om: ObjectMapper
+    private val om: ObjectMapper,
+    private val memoryRepository: InMemoryRepository
 ) : UsernamePasswordAuthenticationFilter() {
 
     private val log = KotlinLogging.logger { }
@@ -51,13 +53,13 @@ class CustomUserNameAuthenticationFilter(
     override fun successfulAuthentication(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        chain: FilterChain?,
-        authResult: Authentication?
+        chain: FilterChain,
+        authResult: Authentication
     ) {
 
         log.debug { "로그인 완료 후 JWT 토큰 만들어서 response" }
 
-        val principalDetails = authResult?.principal as PrincipalDetails
+        val principalDetails = authResult.principal as PrincipalDetails
 
 
         val accessToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
@@ -72,6 +74,8 @@ class CustomUserNameAuthenticationFilter(
 
         response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $accessToken")
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+
+        memoryRepository.save(refreshToken, principalDetails)
 
 
         val jsonResult =

@@ -61,10 +61,14 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.4")
 
 
-
     val jdslVersion = "2.2.1.RELEASE"
     implementation("com.linecorp.kotlin-jdsl:hibernate-kotlin-jdsl-jakarta:$jdslVersion")
     implementation("com.linecorp.kotlin-jdsl:spring-data-kotlin-jdsl-starter-jakarta:$jdslVersion")
+
+
+    // 유효기간과 동시성을 같이 지원해주는 map 라이브러리
+    implementation("net.jodah:expiringmap:0.5.11")
+
 }
 
 tasks.withType<KotlinCompile> {

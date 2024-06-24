@@ -25,7 +25,7 @@ class JwtManager(
     private val accessSecretKey: String = "myAccessSecretKey"
     private val refreshSecretKey: String = "myRefreshSecretKey"
 
-    val claimPrincipal = "principal"
+    private val claimPrincipal = "principal"
 
     val authorizationHeader = "Authorization"
     val jwtHeader = "Bearer "
@@ -33,7 +33,8 @@ class JwtManager(
 
     fun generateRefreshToken(principal: String): String? {
 
-        val expireDate = Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(refreshTokenExpireDay))
+        val expireDate =
+            Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(refreshTokenExpireDay))
         log.debug { "refresh token expire date: $expireDate" }
 
 
@@ -54,7 +55,8 @@ class JwtManager(
 
     // Spring Security에서 principal을 인증 주체로 사용함
     fun generateAccessToken(principal: String): String? {
-        val expireDate = Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(accessTokenExpireSecond))
+        val expireDate =
+            Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(accessTokenExpireSecond))
 
         log.debug { "access token expire date: $expireDate" }
 
@@ -103,6 +105,13 @@ class JwtManager(
             // log.error { "Invalid JWT Exception !! ${e.stackTraceToString()}" }
 
             return TokenValidResult.Failure(e)
+        }
+    }
+
+    companion object {
+        fun getRefreshTokenDay(): Long {
+            val jwtManager = JwtManager()
+            return jwtManager.refreshTokenExpireDay
         }
     }
 

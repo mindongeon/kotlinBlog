@@ -25,7 +25,7 @@ data class LoginDto(
     fun toEntity(): Member {
         return Member(
             email = this.email ?: "",
-            rawPassword = encodeRawPassword(),
+            password = encodeRawPassword(),
             role = this.role ?: Role.USER
         )
     }

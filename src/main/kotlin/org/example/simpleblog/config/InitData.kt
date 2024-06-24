@@ -28,28 +28,30 @@ class InitData(
     //  어플리케이션 시작시 실행
     @EventListener(ApplicationReadyEvent::class)
     private fun init() {
-        val members = mutableListOf<Member>()
-        for (i in 1..100) {
-            val member = generateMember()
-            log.info { "insert member = ${member}" }
-            members.add(member)
-        }
+        /*
+                val members = mutableListOf<Member>()
+                for (i in 1..100) {
+                    val member = generateMember()
+                    log.info { "insert member = ${member}" }
+                    members.add(member)
+                }
 
-        memberRepository.saveAll(members)
+                memberRepository.saveAll(members)
 
-        val posts = mutableListOf<Post>()
-        for (i in 1..100) {
-            val post = generatePost()
-            log.info { "insert post = ${post}" }
-            posts.add(post)
-        }
-        postRepository.saveAll(posts)
+                val posts = mutableListOf<Post>()
+                for (i in 1..100) {
+                    val post = generatePost()
+                    log.info { "insert post = ${post}" }
+                    posts.add(post)
+                }
+                postRepository.saveAll(posts)
+        */
     }
 
     private fun generatePost(): Post = PostSaveReq(
         title = faker.theExpanse.ships(),
         content = faker.quote.matz(),
-        memberId = 1
+        memberId = (1..100).random().toLong()
     ).toEntity()
 
 

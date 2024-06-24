@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import org.example.simpleblog.domain.InMemoryRepository
 import org.example.simpleblog.domain.member.MemberRepository
 import org.example.simpleblog.util.CookieProvider
 import org.springframework.security.authentication.AuthenticationManager
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 class CustomBasicAuthenticationFilter(
     private val memberRepository: MemberRepository,
+    private val memoryRepository: InMemoryRepository,
     private val om: ObjectMapper,
     authenticationManager: AuthenticationManager
 ) : BasicAuthenticationFilter(authenticationManager) {
@@ -55,8 +57,9 @@ class CustomBasicAuthenticationFilter(
                 }
                 /* 이미 발급한 refreshToken (쿠키로 감싸져 있음)
                   까내서 요걸 토대로 다시 accessToken 발급하기. */
-                val principalString = jwtManager.getPrincipalStringByRefreshToken(refreshToken)
-                val details = om.readValue(principalString, PrincipalDetails::class.java)
+//                val principalString = jwtManager.getPrincipalStringByRefreshToken(refreshToken)
+                val details = memoryRepository.findByKey(refreshToken) as PrincipalDetails
+//                val details = om.readValue(principal, PrincipalDetails::class.java)
 
                 reissueAccessToken(details, response)
                 setAuthentication(details, chain, request, response)
