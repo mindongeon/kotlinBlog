@@ -24,7 +24,10 @@ class CustomUserNameAuthenticationFilter(
     private val log = KotlinLogging.logger { }
     private val jwtManager = JwtManager()
 
-    override fun attemptAuthentication(request: HttpServletRequest?, response: HttpServletResponse?): Authentication {
+    override fun attemptAuthentication(
+        request: HttpServletRequest?,
+        response: HttpServletResponse?
+    ): Authentication {
 
         log.debug { "login 요청 옴" }
 
@@ -36,7 +39,8 @@ class CustomUserNameAuthenticationFilter(
         }
 
         log.debug { "loginDto ::: $loginDto" }
-        val authenticationToken = UsernamePasswordAuthenticationToken(loginDto.email, loginDto.password)
+        val authenticationToken =
+            UsernamePasswordAuthenticationToken(loginDto.email, loginDto.rawPassword)
 
         log.debug { "로그인 토큰 ${om.writeValueAsString(authenticationToken.principal)}" }
 
@@ -59,14 +63,19 @@ class CustomUserNameAuthenticationFilter(
         val accessToken = jwtManager.generateAccessToken(om.writeValueAsString(principalDetails))
         val refreshToken = jwtManager.generateRefreshToken(om.writeValueAsString(principalDetails))
 
-        val refreshCookie = CookieProvider.createCookie(REFRESH_COOKIE, refreshToken!!, TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay))
+        val refreshCookie = CookieProvider.createCookie(
+            REFRESH_COOKIE,
+            refreshToken!!,
+            TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay)
+        )
 
 
         response.addHeader(jwtManager.authorizationHeader, "${jwtManager.jwtHeader} $accessToken")
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
 
 
-        val jsonResult = om.writeValueAsString(CmResDto(HttpStatus.OK, "login success", principalDetails.member))
+        val jsonResult =
+            om.writeValueAsString(CmResDto(HttpStatus.OK, "login success", principalDetails.member))
 
         // kotlin에서는 java처럼 class를 강제하지 않아 util같은 정적 클래스를 선언하지 않아도 됨.
         responseData(response, jsonResult)

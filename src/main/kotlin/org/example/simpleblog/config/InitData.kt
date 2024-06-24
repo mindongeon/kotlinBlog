@@ -2,7 +2,10 @@ package org.example.simpleblog.config
 
 import io.github.serpro69.kfaker.faker
 import mu.KotlinLogging
-import org.example.simpleblog.domain.member.*
+import org.example.simpleblog.domain.member.LoginDto
+import org.example.simpleblog.domain.member.Member
+import org.example.simpleblog.domain.member.MemberRepository
+import org.example.simpleblog.domain.member.Role
 import org.example.simpleblog.domain.post.Post
 import org.example.simpleblog.domain.post.PostRepository
 import org.example.simpleblog.domain.post.PostSaveReq
@@ -13,7 +16,8 @@ import org.springframework.context.event.EventListener
 
 @Configuration
 class InitData(
-    private val memberRepository: MemberRepository, private val postRepository: PostRepository
+    private val memberRepository: MemberRepository,
+    private val postRepository: PostRepository,
 ) {
 
     val faker = faker { }
@@ -24,7 +28,6 @@ class InitData(
     //  어플리케이션 시작시 실행
     @EventListener(ApplicationReadyEvent::class)
     private fun init() {
-/*
         val members = mutableListOf<Member>()
         for (i in 1..100) {
             val member = generateMember()
@@ -41,7 +44,6 @@ class InitData(
             posts.add(post)
         }
         postRepository.saveAll(posts)
-*/
     }
 
     private fun generatePost(): Post = PostSaveReq(
@@ -53,7 +55,7 @@ class InitData(
 
     private fun generateMember(): Member = LoginDto(
         email = faker.internet.safeEmail(),
-        password = "1234",
+        rawPassword = "1234",
         role = Role.USER
     ).toEntity()
 

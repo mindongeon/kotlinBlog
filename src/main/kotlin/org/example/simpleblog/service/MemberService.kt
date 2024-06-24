@@ -1,6 +1,7 @@
 package org.example.simpleblog.service
 
-import org.example.simpleblog.domain.member.*
+import org.example.simpleblog.domain.member.MemberRepository
+import org.example.simpleblog.domain.member.MemberRes
 import org.example.simpleblog.exception.MemberNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -20,11 +21,6 @@ class MemberService(
         memberRepository.findMembers(pageable).map {
             it.toDto()
         }
-
-    @Transactional
-    fun saveMember(dto : LoginDto): MemberRes {
-        return memberRepository.save(dto.toEntity()).toDto()
-    }
 
     @Transactional
     fun deleteMember(id: Long) {
