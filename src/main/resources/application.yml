@@ -23,11 +23,9 @@ spring:
         default_batch_fetch_size: 1000
         globally_quoted_identifiers: true
     show_sql: true
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 0
+  config:
+    activate:
+      on-profile: local
 
 #p6spy query logging
 decorator:
